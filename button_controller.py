@@ -5,7 +5,7 @@ import feeder
 
 def feed():
     print("Feeding...")
-    asyncio.create_task(feeder.feed(3))
+    asyncio.create_task(feeder.feed(6))
 
 button = Button(pin=6, callback=feed)  # Replace 17 with your GPIO pin number
 async def monitor_button():

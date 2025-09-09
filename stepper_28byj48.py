@@ -45,9 +45,11 @@ class Stepper28BYJ48:
     async def turn(self, direction=1):
         """ Rotate 270 degrees in direction then rotate 90 degrees back then stop"""
         await self.rotate(120, direction)
-        await self.rotate(90, -direction)
+        await self.rotate(60, -direction)
         await self.rotate(120, direction)
-        await self.rotate(90, -direction)
+        await self.rotate(60, -direction)
+        await self.rotate(120, direction)
+        await self.rotate(60, -direction)
 
     async def run(self, turns, direction=1):
         """Rotate 360 degrees for n turns"""
@@ -56,6 +58,8 @@ class Stepper28BYJ48:
             await self.turn(direction)
             # Yield to other tasks between turns
             await asyncio.sleep(0)
+        # Final 60 degree back to original position to pull back the food
+        await self.rotate(60, -direction)
             
     async def stop(self):
         print("Stopping motor...")

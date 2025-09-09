@@ -4,6 +4,13 @@ from wifi import connect_wifi
 from scheduler_webserver import start_web_server
 from ap_webserver import start_web_server as start_ap_web_server
 from button_controller import monitor_button
+from scheduler_job import run_scheduled_jobs
+from lcd_controller import lcd_write, lcd_write_line, lcd_clear
+
+
+
+# Global variable for IP address
+ip = None
 
 # ==== Connect to WiFi ====
 async def connect_to_wifi():
@@ -38,8 +45,10 @@ async def start_ap_mode():
 
 # ==== Main App ====
 async def main():
+    global ip  # Declare ip as global to modify it
+    await lcd_write("Connecting to WiFi...")
     wlan = await connect_to_wifi()
-
+    
     # if wlan is not None
     if wlan is None:
         print("Start ap mode for wifi setup")
@@ -51,11 +60,19 @@ async def main():
         await start_ap_web_server(ip)
     else:
         # Start web server
+        await lcd_write("Starting webserver...")
         ip = wlan.ifconfig()[0]
         await start_web_server(ip)
+        
 
     # Start button monitoring
     asyncio.create_task(monitor_button())
+
+    # Start scheduler job
+    asyncio.create_task(run_scheduled_jobs())
+    await lcd_clear()
+    await lcd_write_line(ip, 0)
+    await lcd_write_line("READY", 1)
 
     # Keep loop alive forever
     while True:
