@@ -5,7 +5,7 @@ from scheduler_webserver import start_web_server
 from ap_webserver import start_web_server as start_ap_web_server
 from button_controller import monitor_button
 from scheduler_job import run_scheduled_jobs
-from lcd_controller import lcd_write, lcd_write_line, lcd_clear
+from oled_controller import oled_write, oled_write_line, oled_clear, oled_power_off
 from feeder import stop
 
 
@@ -50,7 +50,7 @@ async def main():
     
     await stop()  # Ensure motor is stopped on startup
     
-    await lcd_write("Connecting to WiFi...")
+    await oled_write("Connect WiFi...")
     wlan = await connect_to_wifi()
     
     # if wlan is not None
@@ -64,7 +64,7 @@ async def main():
         await start_ap_web_server(ip)
     else:
         # Start web server
-        await lcd_write("Starting webserver...")
+        await oled_write("Starting webserver...")
         ip = wlan.ifconfig()[0]
         await start_web_server(ip)
         
@@ -74,9 +74,9 @@ async def main():
 
     # Start scheduler job
     asyncio.create_task(run_scheduled_jobs())
-    await lcd_clear()
-    await lcd_write_line(ip, 0)
-    await lcd_write_line("READY", 1)
+    await oled_clear()
+    await oled_write_line(ip, 0)
+    await oled_write_line("READY", 2)
 
     # Keep loop alive forever
     while True:
@@ -90,4 +90,5 @@ except KeyboardInterrupt:
     print("🛑 Application stopped")
 finally:
     turn_off_led()
-    print("LED turned off")
+    asyncio.run(oled_power_off())
+    print("OLED display powered off")

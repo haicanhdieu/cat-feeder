@@ -2,7 +2,7 @@ from ntp import localtime
 import uasyncio as asyncio
 from scheduler import load_schedulers, get_schedules
 from feeder import feed
-from lcd_controller import lcd_write_line
+from oled_controller import oled_write_line
 import time
 
 async def run_scheduled_jobs():
@@ -45,6 +45,6 @@ async def display_next_schedule(schedules):
         next_time = min(schedules.keys())
         message = f"Next: {next_time}"
         print(message)
-        await lcd_write_line(message, line=1)
+        await oled_write_line(message, line=2)
     else:
-        await lcd_write_line("No schedules", line=1)
+        await oled_write_line("No schedules", line=2)
