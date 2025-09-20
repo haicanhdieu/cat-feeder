@@ -1,5 +1,6 @@
 import network
 import uasyncio as asyncio
+from ntp import sync_time_with_ntp
 
 # ==== WiFi Connect ====
 async def connect_wifi():
@@ -29,4 +30,5 @@ async def connect_wifi():
         if not wlan.isconnected():
             raise RuntimeError("Failed to connect to WiFi after 10 attempts")
     print("✅ Connected:", wlan.ifconfig())
+    await sync_time_with_ntp()
     return wlan

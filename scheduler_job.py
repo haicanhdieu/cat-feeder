@@ -1,6 +1,8 @@
+from ntp import localtime
 import uasyncio as asyncio
-from scheduler import load_schedulers
+from scheduler import load_schedulers, get_schedules
 from feeder import feed
+from lcd_controller import lcd_write_line
 import time
 
 async def run_scheduled_jobs():
@@ -12,9 +14,13 @@ async def run_scheduled_jobs():
         # Load the current schedules
         schedules = load_schedulers()
         
+        # Display the next scheduled feeding time
+        await display_next_schedule(schedules)
+        
         # Get the current time in HH:MM format
-        current_time_tuple = time.localtime()
+        current_time_tuple = localtime()
         current_time = f"{current_time_tuple[3]:02}:{current_time_tuple[4]:02}"
+        print(f"Current time: {current_time}")
 
         # Check if there's a job for the current time
         if current_time in schedules:
@@ -32,7 +38,13 @@ async def run_scheduled_jobs():
             del schedules[current_time]
 
         # Wait for 60 seconds before checking again
-        await asyncio.sleep(60)
+        await asyncio.sleep(30)
 
-# Entry point for the scheduler job
-# Removed the main function and its invocation
+async def display_next_schedule(schedules):
+    if schedules:
+        next_time = min(schedules.keys())
+        message = f"Next: {next_time}"
+        print(message)
+        await lcd_write_line(message, line=1)
+    else:
+        await lcd_write_line("No schedules", line=1)

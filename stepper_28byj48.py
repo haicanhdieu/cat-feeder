@@ -1,7 +1,7 @@
 import uasyncio as asyncio
 
 class Stepper28BYJ48:
-    def __init__(self, in1, in2, in3, in4, delay=2):
+    def __init__(self, in1, in2, in3, in4, delay=1):
         self.stop_signal = False
         self.pins = [in1, in2, in3, in4]
         self.delay = delay / 1000.0  # ms to seconds
@@ -43,13 +43,10 @@ class Stepper28BYJ48:
         self._set_pins([0,0,0,0])
         
     async def turn(self, direction=1):
-        """ Rotate 270 degrees in direction then rotate 90 degrees back then stop"""
-        await self.rotate(120, direction)
-        await self.rotate(60, -direction)
-        await self.rotate(120, direction)
-        await self.rotate(60, -direction)
-        await self.rotate(120, direction)
-        await self.rotate(60, -direction)
+        """ Rotate 270 degrees in direction then rotate 90 degrees back then stop, repeated 3 times """
+        for _ in range(6):
+            await self.rotate(90, direction)
+            await self.rotate(45, -direction)
 
     async def run(self, turns, direction=1):
         """Rotate 360 degrees for n turns"""

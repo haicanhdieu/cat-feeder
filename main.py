@@ -6,6 +6,7 @@ from ap_webserver import start_web_server as start_ap_web_server
 from button_controller import monitor_button
 from scheduler_job import run_scheduled_jobs
 from lcd_controller import lcd_write, lcd_write_line, lcd_clear
+from feeder import stop
 
 
 
@@ -46,6 +47,9 @@ async def start_ap_mode():
 # ==== Main App ====
 async def main():
     global ip  # Declare ip as global to modify it
+    
+    await stop()  # Ensure motor is stopped on startup
+    
     await lcd_write("Connecting to WiFi...")
     wlan = await connect_to_wifi()
     
